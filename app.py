@@ -1,17 +1,12 @@
-from pathlib import Path
-
 import streamlit as st
 from PIL import Image
-
+from pathlib import Path
 
 # --- PATH SETTINGS ---
-current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
-css_file = current_dir / "styles" / "main.css"
-profile_pic = current_dir / "assets" / "profile-pic.webp"
-# schedule_pic = current_dir / "assets" / "schedule-pic.png"
-
-
-
+# Since Streamlit does not support __file__, directly set paths for assets and CSS.
+css_file = "styles/main.css"
+profile_pic = "assets/profile-pic.webp"
+# schedule_pic = "assets/schedule-pic.png"  # Uncomment if you want this image
 
 # --- GENERAL SETTINGS ---
 PAGE_TITLE = "Profile | Hoai Thuong Le"
@@ -25,19 +20,25 @@ PHONE = "0372267703"
 ADDRESS = "1 Nguyen Canh Di St, Tan Binh District, HCM City"
 st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON)
 
-
-
+# Sidebar menu options
 st.sidebar.success("Select a page under!")
+menu = ["Overview", "Schedule", "Inforgraphic"]
+choice = st.sidebar.selectbox(" ", menu)
 
-menu = ["Overview", "Schedule","Inforgraphic"]
-choice = st.sidebar.selectbox(" ",menu)
-
+# --- Overview Page ---
 if choice == "Overview":
-    with st.spinner("Loading Overview..."):  # Thêm spinner
-        # --- LOAD CSS & PROFILE PIC ---
-        with open(css_file) as f:
-            st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
-        profile_pic = Image.open(profile_pic)
+    with st.spinner("Loading Overview..."):  # Spinner during loading
+        # --- Load CSS & Profile Pic ---
+        try:
+            with open(css_file) as f:
+                st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
+        except FileNotFoundError:
+            st.warning(f"CSS file '{css_file}' not found!")
+        
+        try:
+            profile_pic = Image.open(profile_pic)
+        except FileNotFoundError:
+            st.warning(f"Profile picture '{profile_pic}' not found!")
 
         # --- HERO SECTION ---
         col1, col2 = st.columns(2, gap="small")
@@ -78,21 +79,26 @@ if choice == "Overview":
             """
         - Not good at communication.
         - My English is not so good but I'm trying to improve.
-        - Sometimes I'm feeling little lazy.
+        - Sometimes I'm feeling a little lazy.
         - I procrastinate when it's time to work and study.
         - Not good at time management.
         """
         )
 
-
+# --- Schedule Page ---
 if choice == "Schedule":
-    image_path_1 = "assets/schedule-pic.webp" 
-    schedule_pic = Image.open(image_path_1)
-    schedule_pic = schedule_pic.resize((800, 800))
-    st.image(schedule_pic, caption="My schedule", use_container_width=True)
-    
+    try:
+        schedule_pic = Image.open("assets/schedule-pic.webp") 
+        schedule_pic = schedule_pic.resize((800, 800))
+        st.image(schedule_pic, caption="My schedule", use_container_width=True)
+    except FileNotFoundError:
+        st.warning("Schedule image not found!")
+
+# --- Infographic Page ---
 if choice == "Inforgraphic":
-    image_path_2 = "assets/LEHOAITHUONG.webp" 
-    info_pic = Image.open(image_path_2)
-    st.image(info_pic, caption="My inforgraphic", use_container_width=True)
-    
+    try:
+        info_pic = Image.open("assets/LEHOAITHUONG.webp") 
+        st.image(info_pic, caption="My infographic", use_container_width=True)
+    except FileNotFoundError:
+        st.warning("Infographic image not found!")
+
